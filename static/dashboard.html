@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Owner Dashboard - E2EE Chat</title>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<style>
+body { font-family: Arial, sans-serif; padding: 20px; }
+#messages { border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px; margin-bottom: 10px; }
+.message { margin-bottom: 5px; }
+.sender { font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h2>E2EE Chat Dashboard</h2>
+
+<label>Username: <input type="text" id="username" placeholder="Enter your username"></label><br><br>
+<button onclick="joinRoom()">Join Room</button>
+
+<h3>Messages</h3>
+<div id="messages"></div>
+
+<h3>Send Message</h3>
+<label>To: <input type="text" id="to"></label><br>
+<label>Message: <input type="text" id="msg"></label><br>
+<button onclick="sendMessage()">Send</button>
+
+<script>
+const socket = io();
+
+// Join your own room
+function joinRoom() {
+    const username = document.getElementById('username').value;
+    if (!username) return alert("Enter a username first");
+    socket.emit('join', {username});
+}
+
+// Receive messages in real-time
+socket.on('new_message', (data) => {
+    const container = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = 'message';
+    div.innerHTML = `<span class="sender">${data.sender}</span>: ${data.message}`;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+});
+
+// Send message via API
+function sendMessage() {
+    const sender = document.getElementById('username').value;
+    const receiver = document.getElementById('to').value;
+    const message = document.getElementById('msg').value;
+    if (!sender || !receiver || !message) return alert("Fill all fields");
+
+    fetch('/api/send', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({sender, receiver, message})
+    }).then(res => res.json()).then(data => {
+        console.log(data);
+        document.getElementById('msg').value = '';
+    });
+}
+</script>
+
+</body>
+</html>
+
+
+<div id="messages"></div>
+<input type="text" id="to" placeholder="Send to username">
+<input type="text" id="message" placeholder="Type your message">
+<button onclick="sendMessage()">Send</button>

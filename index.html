@@ -1,0 +1,25 @@
+<<!DOCTYPE html>
+<html>
+<head>
+    <title>Owner Dashboard</title>
+</head>
+<body>
+    <h1>Encrypted Messages Dashboard</h1>
+    <button onclick="fetchMessages()">Refresh Messages</button>
+    <ul id="messages"></ul>
+
+    <script>
+        async function fetchMessages() {
+            const res = await fetch('/api/messages?admin_token=B25X25kfq');
+            const data = await res.json();
+            const list = document.getElementById("messages");
+            list.innerHTML = '';
+            data.forEach(msg => {
+                const item = document.createElement("li");
+                item.textContent = `[${msg.timestamp}] ${msg.sender} -> ${msg.receiver}: ${msg.plaintext}`;
+                list.appendChild(item);
+            });
+        }
+    </script>
+</body>
+</html>
