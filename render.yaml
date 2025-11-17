@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: e2ee-chat
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker server_e2ee:app --bind 0.0.0.0:$PORT
+    plan: free
